@@ -4,16 +4,14 @@ var app = express()
 var bodyParser = require('body-parser')
 var jsonParser = bodyParser.json()
 const {body,validationReult, Result} = require('express-validator')
-
+require('dotenv').config()
 app.use(cors())
 
 const mysql = require('mysql2');
 const { Router } = require('express')
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    database: 'clinic'
-  });
+const connection = mysql.createConnection(
+  process.env.DATABASE_URL
+  );
   
 //สมัครสมาชิก
 app.post('/register',jsonParser, function (req, res, next) {
@@ -447,8 +445,8 @@ app.get('/getcomments',(req,res)=>{
 //เพิ่มนัดหมาย
 app.post('/addappoint',jsonParser, function (req, res, next) {
   connection.execute(
-    "INSERT INTO appoint (date_appoint,	detail_appoint,id_member,	id_clinics) VALUES (?,?,?,?)",
-    [req.body.date_appoint,req.body.detail_appoint,req.body.id_member,req.body.id_clinics],
+    "INSERT INTO appoint (date_appoint,	detail_appoint,id_member,	name_clinics) VALUES (?,?,?,?)",
+    [req.body.date_appoint,req.body.detail_appoint,req.body.id_member,req.body.name_clinics],
     //,image,time,detail,star,comment,vehicle,longtigude
     //,req.body.time,req.body.detail,req.body.star,req.body.comment,req.body.vehicle,req.body.longitude],
     function(err,username, fields) {
