@@ -6,11 +6,17 @@ var jsonParser = bodyParser.json()
 const {body,validationReult, Result} = require('express-validator')
 require('dotenv').config()
 app.use(cors())
-
 const mysql = require('mysql2');
 const { Router } = require('express')
 const connection = mysql.createConnection(
-  process.env.DATABASE_URL
+  /*{
+    host: 'localhost',
+    user: 'root',
+    database: 'clinic',
+    password: ''
+   }*/
+  
+ // process.env.DATABASE_URL
   );
   
 //สมัครสมาชิก
@@ -179,27 +185,77 @@ app.post('/login',jsonParser, function (req, res, next) {
       })*/
 
   //เพิ่มข้อมูลคลินิก
-  app.post('/creatclinic',jsonParser, function (req, res, next) {
-        connection.execute(
-          "INSERT INTO clinics (name_clinics,address_clinics,tell_clinics,img_clinics,time_clinics,type_clinics,detail_clinics,vehicle_clinics,latitude_clinics,longitude_clinics,search_clinics) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-          [req.body.name_clinics,req.body.address_clinics,req.body.tell_clinics,req.body.img_clinics,req.body.time_clinics,req.body.type_clinics,req.body.detail_clinics,req.body.vehicle_clinics,req.body.latitude_clinics,req.body.longitude_clinics,req.body.search_clinics],
-          //,image,time,detail,star,comment,vehicle,longtigude
-          //,req.body.time,req.body.detail,req.body.star,req.body.comment,req.body.vehicle,req.body.longitude],
-          function(err,username, fields) {
-            if(err){
-                res.json({status:'error', message:err})
-                return
-            } 
-            res.json({status:'Ok'})
-          }
-        );
-         
+  app.post('/creatclinic',jsonParser, async function (req, res, next) {
+    console.log(req.body.name_clinics)
+    //var a = false;
+    var b ;
+   
+    try{
+
+ 
+      /*
+          for(let i =0 ; i<result.length ; i++){
+          //console.log(result[i]["name_clinics"])
+      
+        if(result[i]["name_clinics"] == req.body.name_clinics){
+          return true
+          //console.log(หกด)
+          //res.json({status:'error', message:"ชื่อซ้ำ"})
+        }
+      */ 
+        let data1 
+        const setData = (data)=>{
+          let a = false
+          data1 = data
+          for(let i =0 ; i<data.length ; i++){
+            //console.log(result[i]["name_clinics"])
+        
+          if(data[i]["name_clinics"] == req.body.name_clinics){
+            a =true
+          
+          
+        }
+      }
+      console.log(a)
+      if(a ==true){
+        res.send("ชื่อซ้ำ")
+        return
+      }
+      connection.execute(
+        "INSERT INTO clinics (name_clinics,address_clinics,tell_clinics,img_clinics,time_clinics,type_clinics,detail_clinics,vehicle_clinics,latitude_clinics,longitude_clinics,search_clinics) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+        [req.body.name_clinics,req.body.address_clinics,req.body.tell_clinics,req.body.img_clinics,req.body.time_clinics,req.body.type_clinics,req.body.detail_clinics,req.body.vehicle_clinics,req.body.latitude_clinics,req.body.longitude_clinics,req.body.search_clinics],
+        //,image,time,detail,star,comment,vehicle,longtigude
+        //,req.body.time,req.body.detail,req.body.star,req.body.comment,req.body.vehicle,req.body.longitude],
+        function(err,username, fields) {
+          if(err){
+              res.json({status:'error', message:err})
+              return
+          } 
+          res.json({status:'Ok'})
+        }
+      );
+
+    }
+
+let query = 'SELECT * FROM clinics ORDER BY id_clinics DESC';
+ connection.query(query , async function(err, results, fields) {
+//console.log(results)
+await setData(results)
+})
+
+console.log("หดกเ")
+     
+      }catch(err){
+        console.log("ๅๅ")
+        res.json({status:'error', message:"ชื่อซ้ำ"})
+        return;
+      }
         })
 
   //แสดงข้อมูลคลินิก
  app.get('/getclinic',(req,res)=>{
   connection.execute(
-    'SELECT * FROM clinics',(error,result,fields)=>{
+    'SELECT * FROM clinics ORDER BY id_clinics DESC',(error,result,fields)=>{
       if(error)throw error;
 
       let message=""
@@ -216,6 +272,8 @@ app.post('/login',jsonParser, function (req, res, next) {
  })    
  //แก้ไข้ข้อมูลคลินิก
 app.put('/editclinic',jsonParser,function(req,res,next){
+
+
     connection.execute(
       'UPDATE clinics SET name_clinics = ?,address_clinics= ?,tell_clinics= ?,img_clinics= ?,time_clinics= ?,type_clinics= ?,detail_clinics= ?,vehicle_clinics= ?,latitude_clinics= ?,longitude_clinics= ? ,search_clinics = ? WHERE id_clinics = ?',
       [req.body.name_clinics,req.body.address_clinics,req.body.tell_clinics,req.body.img_clinics,req.body.time_clinics,req.body.type_clinics,req.body.detail_clinics,req.body.vehicle_clinics,req.body.latitude_clinics,req.body.longitude_clinics,req.body.search_clinics,req.body.id_clinics],
@@ -228,6 +286,7 @@ app.put('/editclinic',jsonParser,function(req,res,next){
 
 //แก้ไขข้อมูลคลินิกที่รออนุมัติ
 app.put('/editclinicawaiting',jsonParser,function(req,res,next){
+  
   connection.execute(
     'UPDATE clinicsawaiting SET name_waiting = ?,address_waiting = ?,tell_waiting = ?,type_waiting = ?,vehicle_waiting = ?,time_waiting = ?,latitude_waiting = ?,longitude_waiting = ?,detail_waiting =?,img_waiting =? WHERE id_waiting = ?',
     [req.body.name_waiting,req.body.address_waiting,req.body.tell_waiting,req.body.type_waiting ,req.body.time_waiting,req.body.vehicle_waiting,req.body.latitude_waiting,req.body.longitude_waiting,req.body.detail_waiting ,req.bodyimg_waiting,req.body.id_waiting],
@@ -293,6 +352,8 @@ app.delete('/deleteclinic',jsonParser,function (req,res,next){
 
   //แสดงข้อมูลคลินิกที่รออนุมัติ
   app.get('/getclinicsawaiting',(req,res)=>{
+
+
       connection.execute(
         'SELECT * FROM clinicsawaiting',(error,result,fields)=>{
           if(error)throw error;
@@ -359,9 +420,9 @@ require('dotenv').config()
 
 
 cloudinary.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.API_KEY,
-    api_secret: process.env.API_SECRET
+    cloud_name: "dd5mmjakh",
+    api_key: "286357125488246",
+    api_secret: "SUg5i8kYPVOhVevhi0WylyyQzss"
 });
 
 //Create a server
@@ -372,12 +433,12 @@ http.createServer((req, res) => {
        const form = formidable();
 
         form.parse(req, (err, fields, files) => {
-          console.log(files)
+          //console.log(files)
 
             //https://cloudinary.com/documentation/upload_images
             cloudinary.uploader.upload(files.files.filepath, result => {
 
-                console.log(result)
+                //console.log(result)
                 res.end(util.inspect(result.url));
                 return;
                 if (result.public_id) {
@@ -487,6 +548,44 @@ app.post('/addappoint',jsonParser, function (req, res, next) {
     )
   })
 
+  //แก้ไข้ warn
+  app.put('/editwarn',jsonParser,function(req,res,next){
+ console.log(req.body.read_warn)
+ console.log("ๅๅๅ")
+    connection.execute(
+      'UPDATE warn SET read_warn = ? WHERE id_warn = ? ',
+      [req.body.read_warn,1],
+      function(err,result){
+        if(err){
+          res.json(err);
+        }
+        console.log(err)
+        res.json(result);
+      }       
+      )
+  
+  })
+//แสดง warn
+  app.get('/getwarn',(req,res)=>{
+    connection.execute(
+      'SELECT * FROM warn',(error,result,fields)=>{
+        if(error){
+          return res.json({error:error});
+        }
+  
+        let message=""
+        if(result === undefined || result.length==0){
+          message = "no";
+        }else{
+          message = "สำเร็จ";
+        }
+        
+        //console.log(result)
+        return res.json({error:false,data:result,message:message});
+  
+      }
+    )
+   }) 
 
 app.listen(3333, jsonParser, function () {
   console.log('CORS-enabled web server listening on port 3333')
