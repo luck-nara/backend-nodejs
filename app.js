@@ -16,7 +16,7 @@ const connection = mysql.createConnection(
     password: ''
    }*/
   
- // process.env.DATABASE_URL
+  process.env.DATABASE_URL
   );
   
 //สมัครสมาชิก
