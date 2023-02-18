@@ -16,7 +16,7 @@ const connection = mysql.createConnection(
     password: ''
    }*/
   
-  process.env.DATABASE_URL
+process.env.DATABASE_URL
   );
   
 //สมัครสมาชิก
@@ -273,7 +273,7 @@ console.log("หดกเ")
  //แก้ไข้ข้อมูลคลินิก
 app.put('/editclinic',jsonParser,function(req,res,next){
 
-
+console.log(req.body)
     connection.execute(
       'UPDATE clinics SET name_clinics = ?,address_clinics= ?,tell_clinics= ?,img_clinics= ?,time_clinics= ?,type_clinics= ?,detail_clinics= ?,vehicle_clinics= ?,latitude_clinics= ?,longitude_clinics= ? ,search_clinics = ? WHERE id_clinics = ?',
       [req.body.name_clinics,req.body.address_clinics,req.body.tell_clinics,req.body.img_clinics,req.body.time_clinics,req.body.type_clinics,req.body.detail_clinics,req.body.vehicle_clinics,req.body.latitude_clinics,req.body.longitude_clinics,req.body.search_clinics,req.body.id_clinics],
@@ -355,7 +355,7 @@ app.delete('/deleteclinic',jsonParser,function (req,res,next){
 
 
       connection.execute(
-        'SELECT * FROM clinicsawaiting',(error,result,fields)=>{
+        'SELECT * FROM clinicsawaiting  ORDER BY id_waiting DESC',(error,result,fields)=>{
           if(error)throw error;
     
           let message=""
@@ -466,7 +466,7 @@ http.createServer((req, res) => {
  //แสดงคอมเม้น
 app.get('/getcomments',(req,res)=>{
   connection.execute(
-    'SELECT * FROM comments',(error,result,fields)=>{
+    'SELECT * FROM comments  ORDER BY id_comment DESC',(error,result,fields)=>{
       if(error)throw error;
 
       let message=""
@@ -523,7 +523,7 @@ app.post('/addappoint',jsonParser, function (req, res, next) {
   //แสดงวันนัดหมาย
   app.get('/getappoint',(req,res)=>{
     connection.execute(
-      'SELECT * FROM appoint',(error,result,fields)=>{
+      'SELECT * FROM appoint  ORDER BY id_appoint DESC',(error,result,fields)=>{
         if(error)throw error;
   
         let message=""
