@@ -9,7 +9,7 @@ app.use(cors())
 const mysql = require('mysql2');
 const { Router } = require('express')
 const connection = mysql.createConnection(
-  /*{
+/*  {
     host: 'localhost',
     user: 'root',
     database: 'clinic',
@@ -420,9 +420,9 @@ require('dotenv').config()
 
 
 cloudinary.config({
-    cloud_name: "dd5mmjakh",
-    api_key: "286357125488246",
-    api_secret: "SUg5i8kYPVOhVevhi0WylyyQzss"
+    cloud_name: "dqvq5bo0u",
+    api_key: "448124316576359",
+    api_secret: "vpXqcJQ0dUIPIqCYGQKqWXSMHCk"
 });
 
 //Create a server
@@ -586,6 +586,44 @@ app.post('/addappoint',jsonParser, function (req, res, next) {
       }
     )
    }) 
+   app.get('/getview',(req,res)=>{
+    connection.execute(
+      'SELECT * FROM view',(error,result,fields)=>{
+        if(error){
+          return res.json({error:error});
+        }
+  
+        let message=""
+        if(result === undefined || result.length==0){
+          message = "no";
+        }else{
+          message = "สำเร็จ";
+        }
+        
+        //console.log(result)
+        return res.json({error:false,data:result,message:message});
+  
+      }
+    )
+   })
+  
+    app.put('/editview',jsonParser,function(req,res,next){
+      console.log(req.body)
+      console.log("ๅๅๅ")
+      connection.execute(
+        'UPDATE clinics SET view_clinics = ? WHERE id_clinics = ? ',
+        [Number(req.body.view_clinics),req.body.id_clinics],
+        function(err,result){
+          if(err){
+            console.log(err)
+            res.json(err);
+          }
+          console.log(result)
+          res.json(result);
+        }  )     
+       
+       
+       })
 
 app.listen(3333, jsonParser, function () {
   console.log('CORS-enabled web server listening on port 3333')
